@@ -1,6 +1,6 @@
 # Testing
 
-> Status: no tests exist yet — this documents the planned setup for when packages/* are scaffolded.
+> Status: `shared`, `recorder`, and `player` have Vitest suites in `application/packages/*/test/`. `video-exporter` and `apps/web` aren't scaffolded yet.
 
 ## Frameworks
 
@@ -21,16 +21,15 @@ pnpm test -- --watch       # watch mode
 
 | Area | Location | Coverage notes |
 |---|---|---|
-| recorder capture (state/props diff) | `packages/recorder/test/` | not started |
-| recorder capture (DOM mutation) | `packages/recorder/test/` | not started |
-| recorder capture (network) | `packages/recorder/test/` | not started |
-| player deterministic replay | `packages/player/test/` | not started — highest-risk area, needs a "record then replay, assert identical final state" test harness before anything else |
-| video-exporter frame capture | `packages/video-exporter/test/` | not started |
-| apps/web share link flow | `apps/web/test/` | not started |
+| recorder capture (state/props diff) | `application/packages/recorder/test/recorder.test.ts` | covered — asserts a `useState` update produces a `state-diff` event |
+| recorder capture (DOM mutation) | `application/packages/recorder/test/recorder.test.ts` | covered |
+| recorder capture (network) | — | not started — `network-hook.ts` wraps `fetch` but has no direct test yet |
+| player deterministic replay | `application/packages/player/test/roundtrip.test.ts` | covered — record/replay round trip, repeat-seek determinism, and an adjacent-text-node regression case |
+| video-exporter frame capture | `packages/video-exporter/test/` | not started — package not scaffolded |
+| apps/web share link flow | `apps/web/test/` | not started — app not scaffolded |
 
 ## Known gaps
 
-- Everything — repo has no code yet. Priority once scaffolded: a
-  round-trip test (record a scripted interaction, replay it, assert the
-  final DOM/state matches) since deterministic replay is the riskiest
-  technical bet in the whole project.
+- `network-hook.ts` (fetch interception) has no direct test — only exercised indirectly via `Recorder`.
+- XHR interception isn't implemented, so no test either.
+- Player's `childList` replay only supports appends (see TODO.md); no test covers removal or reordering since the recorder doesn't capture enough info to replay them yet.

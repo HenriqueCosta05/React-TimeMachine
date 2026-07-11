@@ -1,6 +1,6 @@
 # Architecture & Walkthrough
 
-> Status: target design. No code written yet — this is the spec the first implementation should follow, not a description of working code.
+> Status: `shared`, `recorder`, and `player` are implemented and tested in `application/packages/`, wired together live in `application/apps/demo`. `video-exporter` and `apps/web` are not started — this section still describes the target design for those.
 
 ## Overview
 

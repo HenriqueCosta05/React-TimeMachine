@@ -4,15 +4,12 @@ Live backlog. Remove items when done — this is not a changelog.
 
 ## Now
 
-- [ ] Scaffold pnpm monorepo (packages/recorder, player, video-exporter, shared; apps/demo, web)
-- [ ] Recorder: hook React Fiber commit phase to diff state/props per component
-- [ ] Recorder: MutationObserver-based DOM capture
-- [ ] Recorder: fetch/XHR interception (request/response, timing)
-- [ ] Shared event schema: single ordered log of {timestamp, type, payload} events
-- [ ] Player: deterministic replay of a captured event log against apps/demo
+- [ ] Recorder: XHR interception (fetch-only today)
+- [ ] Player: childList replay only supports appends (no recorded sibling position, so out-of-order inserts/removals aren't reconstructed)
 
 ## Next
 
+- [ ] Scaffold packages/video-exporter and apps/web
 - [ ] Timeline scrubber UI (jump to any point in the recording)
 - [ ] video-exporter: Playwright-driven headless replay -> MP4
 - [ ] Shareable replay link: upload recording, generate viewable URL (apps/web)
@@ -27,4 +24,4 @@ Live backlog. Remove items when done — this is not a changelog.
 
 ## Known issues
 
-- [ ] No code exists yet — architecture below is a target design, not yet validated against a real capture
+- [ ] Fiber commit hook must install before `react-dom/client` first evaluates (same constraint as the real DevTools extension) — apps/demo works around this with a dedicated `instrumentation.ts` imported first; document this requirement wherever recorder gets embedded next
