@@ -1,6 +1,6 @@
 {
   "name": "@react-time-machine/recorder",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Captures state/props diffs, DOM mutations, and network activity into one ordered event log.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,6 +13,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",

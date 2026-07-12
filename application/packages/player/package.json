@@ -1,6 +1,6 @@
 {
   "name": "@react-time-machine/player",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Deterministic replay of a captured event log — re-applies DOM/state events in order against a live or headless instance of the app.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,6 +13,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
