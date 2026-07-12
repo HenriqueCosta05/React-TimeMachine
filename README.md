@@ -2,12 +2,10 @@
 
 Records every state change, DOM mutation, and network request in a React app, then replays it deterministically.
 
-Published on npm as a single wrapper package plus its underlying pieces, all scoped to `@henriquecosta`:
+![Overview](docs/assets/overview.png)
+Published on npm as a single wrapper package plus its underlying pieces, all scoped to `@henriquecosta`, my npm username:
 
 - [`@henriquecosta/react-debugmachine`](https://www.npmjs.com/package/@henriquecosta/react-debugmachine) — single-entry-point package, install this one
-- `@henriquecosta/react-debugmachine-recorder` — browser-side capture agent (React Fiber state/props diffs, DOM `MutationObserver`, fetch/XHR interception)
-- `@henriquecosta/react-debugmachine-player` — deterministic replay engine
-- `@henriquecosta/react-debugmachine-shared` — event schema/serialization format shared by recorder and player
 
 ## Project structure
 
@@ -25,10 +23,10 @@ docs/              architecture, design, changelog
 deployment/        CI + hosting config
 ```
 
-## Quick start
+## Quick start (development)
 
 ```bash
-git clone <repo>
+git clone "git@github.com:HenriqueCosta05/React-TimeMachine.git"
 ./scripts/bootstrap.ps1        # or ./scripts/bootstrap.sh
 cd application
 pnpm dev                       # runs apps/demo with recorder attached
