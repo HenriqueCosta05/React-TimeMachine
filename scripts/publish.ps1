@@ -15,25 +15,28 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Invoke-Checked {
+  param([string]$Description, [scriptblock]$Command)
+  Write-Host "==> $Description"
+  & $Command
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "FAILED: $Description (exit code $LASTEXITCODE)"
+    exit $LASTEXITCODE
+  }
+}
+
 $root = Split-Path -Parent $PSScriptRoot
 $app = Join-Path $root "application"
 
 Set-Location $app
 
-Write-Host "==> Installing dependencies"
-pnpm install --frozen-lockfile
-
-Write-Host "==> Typecheck"
-pnpm -r run typecheck
-
-Write-Host "==> Test"
-pnpm -r run test
-
-Write-Host "==> Build"
-pnpm -r run build
-
-Write-Host "==> Bumping version ($Bump) for publishable packages"
-pnpm --filter "./packages/*" exec -- npm version $Bump --no-git-tag-version
+Invoke-Checked "Installing dependencies" { pnpm install --frozen-lockfile }
+Invoke-Checked "Typecheck" { pnpm -r run typecheck }
+Invoke-Checked "Test" { pnpm -r run test }
+Invoke-Checked "Build" { pnpm -r run build }
+Invoke-Checked "Bumping version ($Bump) for publishable packages" {
+  pnpm --filter "./packages/*" exec -- npm version $Bump --no-git-tag-version
+}
 
 $sharedPkgPath = Join-Path $app "packages/shared/package.json"
 $newVersion = (Get-Content $sharedPkgPath -Raw | ConvertFrom-Json).version
@@ -45,11 +48,13 @@ $rootPkg.version = $newVersion
 ($rootPkg | ConvertTo-Json -Depth 20) | Set-Content $rootPkgPath
 
 if ($DryRun) {
-  Write-Host "==> Dry run - publishing skipped"
-  pnpm -r publish --access public --no-git-checks --dry-run
+  Invoke-Checked "Dry run - publishing skipped" {
+    pnpm -r publish --access public --no-git-checks --dry-run
+  }
 } else {
-  Write-Host "==> Publishing to npm"
-  pnpm -r publish --access public --no-git-checks
+  Invoke-Checked "Publishing to npm" {
+    pnpm -r publish --access public --no-git-checks
+  }
 }
 
 Write-Host "==> Done. Published version $newVersion"

@@ -19,7 +19,7 @@ afterEach(() => {
 
 describe("record then replay", () => {
   it("reproduces the final DOM of a scripted interaction", async () => {
-    const { Recorder } = await import("@react-time-machine/recorder");
+    const { Recorder } = await import("@react-debugmachine/recorder");
     const recorder = new Recorder({ root: sourceContainer });
     recorder.start();
 
@@ -46,7 +46,7 @@ describe("record then replay", () => {
   });
 
   it("is deterministic across repeated seeks to the same timestamp", async () => {
-    const { Recorder } = await import("@react-time-machine/recorder");
+    const { Recorder } = await import("@react-debugmachine/recorder");
     const recorder = new Recorder({ root: sourceContainer });
     recorder.start();
 
@@ -73,7 +73,7 @@ describe("record then replay", () => {
     // Serializing the baseline as an HTML string would let the parser merge
     // them into one node on replay, desyncing every path recorded against
     // the original two-node structure — this is a regression test for that.
-    const { Recorder } = await import("@react-time-machine/recorder");
+    const { Recorder } = await import("@react-debugmachine/recorder");
     const recorder = new Recorder({ root: sourceContainer });
     recorder.start();
 

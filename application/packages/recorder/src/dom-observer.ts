@@ -1,4 +1,4 @@
-import type { DomMutationPayload } from "@react-time-machine/shared";
+import type { DomMutationPayload } from "@react-debugmachine/shared";
 import type { RecordingClock } from "./clock";
 import { nodeToSnapshot } from "./dom-snapshot";
 

@@ -400,10 +400,10 @@ importers:
 
   apps/demo:
     dependencies:
-      '@react-time-machine/player':
+      '@react-debugmachine/player':
         specifier: workspace:*
         version: link:../../packages/player
-      '@react-time-machine/recorder':
+      '@react-debugmachine/recorder':
         specifier: workspace:*
         version: link:../../packages/recorder
       react:
@@ -434,11 +434,11 @@ importers:
 
   packages/player:
     dependencies:
-      '@react-time-machine/shared':
+      '@react-debugmachine/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
-      '@react-time-machine/recorder':
+      '@react-debugmachine/recorder':
         specifier: workspace:*
         version: link:../recorder
       jsdom:
@@ -453,7 +453,7 @@ importers:
 
   packages/recorder:
     dependencies:
-      '@react-time-machine/shared':
+      '@react-debugmachine/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:

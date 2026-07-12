@@ -4,8 +4,8 @@ import type {
   NetworkResponseEvent,
   Recording,
   StateDiffEvent,
-} from "@react-time-machine/shared";
-import { isSupportedSchemaVersion } from "@react-time-machine/shared";
+} from "@react-debugmachine/shared";
+import { isSupportedSchemaVersion } from "@react-debugmachine/shared";
 import { replayDom } from "./dom-replay";
 
 export interface NetworkExchange {
