@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "complex-demo",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,10 +9,10 @@
     "preview": "rsbuild preview"
   },
   "dependencies": {
-    "@henriquecosta/react-debugmachine-devtools": "workspace:*",
-    "@henriquecosta/react-debugmachine-shared": "workspace:*",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "@henriquecosta/react-debugmachine-devtools": "workspace:*",
+    "@henriquecosta/react-debugmachine-shared": "workspace:*"
   },
   "devDependencies": {
     "@rsbuild/core": "^2.1.5",

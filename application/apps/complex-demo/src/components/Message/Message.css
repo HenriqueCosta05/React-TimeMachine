@@ -1,0 +1,124 @@
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  gap: 4px;
+}
+
+.msg-user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.msg-assistant {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.msg-role {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  padding: 0 4px;
+}
+
+.msg-bubble {
+  border-radius: 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.msg-user .msg-bubble {
+  background: #3b82f6;
+  border-color: transparent;
+  border-bottom-right-radius: 4px;
+}
+
+.msg-assistant .msg-bubble {
+  background: rgba(39, 39, 42, 0.75);
+  border-bottom-left-radius: 4px;
+}
+
+.msg-content {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #fafafa;
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 16px;
+  margin-top: 4px;
+}
+
+.msg-edited {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.msg-edit-trigger {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.msg-bubble:hover .msg-edit-trigger {
+  opacity: 1;
+}
+
+.msg-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 260px;
+}
+
+.msg-edit-textarea {
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fafafa;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 10px;
+}
+
+.msg-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.msg-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fafafa;
+  transition: filter 0.15s ease;
+}
+
+.msg-btn:hover {
+  filter: brightness(1.15);
+}
+
+.msg-btn-primary {
+  background: #22c55e;
+  color: #052e12;
+}

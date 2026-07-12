@@ -1,0 +1,42 @@
+{
+  "name": "@henriquecosta/react-debugmachine-devtools",
+  "version": "1.0.0",
+  "description": "Reusable, embeddable debug UI for React Time Machine — a dev indicator bottom-right toggle with record/replay controls, or bring your own UI via the useTimeMachine hook.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@henriquecosta/react-debugmachine-player": "workspace:*",
+    "@henriquecosta/react-debugmachine-recorder": "workspace:*",
+    "@henriquecosta/react-debugmachine-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  }
+}
