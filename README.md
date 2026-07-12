@@ -44,6 +44,8 @@ npm install @henriquecosta/react-debugmachine
 import { Recorder, Player } from "@henriquecosta/react-debugmachine";
 ```
 
+See [docs/EXAMPLES.md](docs/EXAMPLES.md) for a full record → store → replay → scrub walkthrough against a realistic checkout flow.
+
 ## Prerequisites
 
 - Node 20+
@@ -56,6 +58,7 @@ import { Recorder, Player } from "@henriquecosta/react-debugmachine";
 
 ## Where to look next
 
+- Usage examples (real-world recording/replay flow): [docs/EXAMPLES.md](docs/EXAMPLES.md)
 - Development and publishing workflow: [application/README.md](application/README.md)
 - Architecture and design decisions: [docs/DESIGN.md](docs/DESIGN.md)
 - Changelog: [docs/CHANGELOG.md](docs/CHANGELOG.md)

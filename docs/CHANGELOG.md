@@ -2,6 +2,11 @@
 
 All notable changes to the React Time Machine packages. Versions below refer to `@henriquecosta/react-debugmachine` and its underlying packages, which are versioned together.
 
+## Unreleased
+
+### Added
+- `docs/EXAMPLES.md` — worked usage examples against a realistic checkout-flow app: recording a bug report, replaying it in a viewer, scrubbing the timeline to inspect per-timestamp component state and network activity, and split-package installs for tree-shaking.
+
 ## [1.0.2] — wrapper package
 
 ### Added
