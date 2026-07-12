@@ -1,6 +1,6 @@
 {
   "name": "@henriquecosta/react-debugmachine-recorder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Captures state/props diffs, DOM mutations, and network activity into one ordered event log.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -451,6 +451,28 @@ importers:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
 
+  packages/react-debugmachine:
+    dependencies:
+      '@henriquecosta/react-debugmachine-player':
+        specifier: workspace:*
+        version: link:../player
+      '@henriquecosta/react-debugmachine-recorder':
+        specifier: workspace:*
+        version: link:../recorder
+      '@henriquecosta/react-debugmachine-shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      jsdom:
+        specifier: ^29.1.1
+        version: 29.1.1
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.7)
+
   packages/recorder:
     dependencies:
       '@henriquecosta/react-debugmachine-shared':

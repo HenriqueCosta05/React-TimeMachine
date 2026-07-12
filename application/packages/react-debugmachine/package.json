@@ -1,7 +1,7 @@
 {
-  "name": "@henriquecosta/react-debugmachine-player",
-  "version": "1.0.1",
-  "description": "Deterministic replay of a captured event log — re-applies DOM/state events in order against a live or headless instance of the app.",
+  "name": "@henriquecosta/react-debugmachine",
+  "version": "1.0.0",
+  "description": "Record and deterministically replay React state, DOM, and network activity — single-package entry point bundling recorder, player, and the shared event schema.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -25,11 +25,16 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
   "dependencies": {
+    "@henriquecosta/react-debugmachine-player": "workspace:*",
+    "@henriquecosta/react-debugmachine-recorder": "workspace:*",
     "@henriquecosta/react-debugmachine-shared": "workspace:*"
   },
   "devDependencies": {
-    "@henriquecosta/react-debugmachine-recorder": "workspace:*",
     "jsdom": "^29.1.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
