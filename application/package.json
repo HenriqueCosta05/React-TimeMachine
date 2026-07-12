@@ -1,6 +1,6 @@
 {
   "name": "react-time-machine",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Record and deterministically replay React state, DOM, and network activity.",
   "private": true,
   "scripts": {

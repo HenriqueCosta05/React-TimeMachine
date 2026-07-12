@@ -1,41 +1,62 @@
 # React Time Machine
 
-Records every state change, DOM mutation, and network request in a React app, then replays it deterministically — including generating a shareable video of a bug, from a link. Portfolio project; no code written yet, this repo currently holds only the spec.
+Records every state change, DOM mutation, and network request in a React app, then replays it deterministically.
+
+Published on npm as a single wrapper package plus its underlying pieces, all scoped to `@henriquecosta`:
+
+- [`@henriquecosta/react-debugmachine`](https://www.npmjs.com/package/@henriquecosta/react-debugmachine) — single-entry-point package, install this one
+- `@henriquecosta/react-debugmachine-recorder` — browser-side capture agent (React Fiber state/props diffs, DOM `MutationObserver`, fetch/XHR interception)
+- `@henriquecosta/react-debugmachine-player` — deterministic replay engine
+- `@henriquecosta/react-debugmachine-shared` — event schema/serialization format shared by recorder and player
 
 ## Project structure
 
 ```
-packages/
-  recorder/       browser-side capture agent: React state/props diffs (Fiber),
-                  DOM MutationObserver, fetch/XHR interception
-  player/         deterministic replay engine + timeline scrubber UI
-  video-exporter/ headless replay -> video (Playwright-driven frame capture)
-  shared/         event schema, serialization format shared by recorder/player
-apps/
-  demo/           sample React app used to dogfood the recorder
-  web/            hosted viewer for shareable replay links
-docs/             architecture, design, testing docs (this skill's output)
-deployment/       CI + hosting config for apps/web
+application/        pnpm workspace root — all installable code lives here
+  packages/
+    shared/               event schema, serialization format
+    recorder/             capture agent (Fiber, DOM, network)
+    player/                deterministic replay engine
+    react-debugmachine/   wrapper package re-exporting recorder + player + shared
+  apps/
+    demo/                 sample React app used to dogfood the recorder
+scripts/           bootstrap.ps1/.sh, publish.ps1/.sh — see below
+docs/              architecture, design, changelog
+deployment/        CI + hosting config
 ```
 
 ## Quick start
 
 ```bash
-# not yet implemented — planned once packages/recorder exists
-pnpm install
-pnpm dev            # runs apps/demo with recorder attached
-pnpm test
+git clone <repo>
+./scripts/bootstrap.ps1        # or ./scripts/bootstrap.sh
+cd application
+pnpm dev                       # runs apps/demo with recorder attached
+```
+
+Or, to use the published package in your own app:
+
+```bash
+npm install @henriquecosta/react-debugmachine
+```
+
+```ts
+import { Recorder, Player } from "@henriquecosta/react-debugmachine";
 ```
 
 ## Prerequisites
 
 - Node 20+
-- pnpm 9+
-- Playwright browsers (for video-exporter) — `pnpm exec playwright install`
+- pnpm 9+ (bootstrap script installs it if missing)
+
+## Scripts
+
+- `scripts/bootstrap.ps1` / `scripts/bootstrap.sh` — install pnpm if missing, install workspace deps, build the wrapper package
+- `scripts/publish.ps1` / `scripts/publish.sh` — typecheck/test/build the wrapper package (and its workspace dependencies), bump its version, publish to npm. See [application/README.md](application/README.md) for details.
 
 ## Where to look next
 
-- Architecture and design decisions: [docs/architecture-and-walkthrough.md](docs/architecture-and-walkthrough.md)
-- UI/branding spec: [docs/DESIGN.md](docs/DESIGN.md)
-- Testing: [docs/testing.md](docs/testing.md)
-- Deployment: [deployment/README.md](deployment/README.md)
+- Development and publishing workflow: [application/README.md](application/README.md)
+- Architecture and design decisions: [docs/DESIGN.md](docs/DESIGN.md)
+- Changelog: [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- Deployment: [docs/deployment/README.md](docs/deployment/README.md)

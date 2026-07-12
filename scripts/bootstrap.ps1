@@ -33,10 +33,10 @@ Write-Host "==> Installing workspace dependencies"
 pnpm install
 
 if (-not $SkipBuild) {
-  Write-Host "==> Building packages (shared, recorder, player)"
-  pnpm --filter "./packages/*" run build
+  Write-Host "==> Building react-debugmachine wrapper package"
+  pnpm --filter "./packages/react-debugmachine" run build
 }
 
 Write-Host ""
 Write-Host "==> Bootstrap complete."
-Write-Host "Run 'pnpm dev' from application/ to start the demo app."
+Write-Host "Install '@henriquecosta/react-debugmachine' in a consuming app, or run 'pnpm dev' from application/ to start the demo app."

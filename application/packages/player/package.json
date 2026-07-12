@@ -1,6 +1,6 @@
 {
   "name": "@henriquecosta/react-debugmachine-player",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Deterministic replay of a captured event log — re-applies DOM/state events in order against a live or headless instance of the app.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

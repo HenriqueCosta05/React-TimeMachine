@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Version-bump and publish the publishable packages (shared, recorder, player) to npm.
+# Version-bump and publish the react-debugmachine wrapper package to npm.
 #
 # Usage:
 #   ./scripts/publish.sh 1.0.0
@@ -19,19 +19,21 @@ cd "$APP_DIR"
 echo "==> Installing dependencies"
 pnpm install --frozen-lockfile
 
+WRAPPER_FILTER="./packages/react-debugmachine..."
+
 echo "==> Typecheck"
-pnpm -r run typecheck
+pnpm --filter "$WRAPPER_FILTER" run typecheck
 
 echo "==> Test"
-pnpm -r run test
+pnpm --filter "$WRAPPER_FILTER" run test
 
 echo "==> Build"
-pnpm -r run build
+pnpm --filter "$WRAPPER_FILTER" run build
 
-echo "==> Bumping version ($BUMP) for publishable packages"
-pnpm --filter "./packages/*" exec -- npm version "$BUMP" --no-git-tag-version
+echo "==> Bumping version ($BUMP) for wrapper package"
+pnpm --filter "./packages/react-debugmachine" exec -- npm version "$BUMP" --no-git-tag-version
 
-NEW_VERSION=$(node -p "require('./packages/shared/package.json').version")
+NEW_VERSION=$(node -p "require('./packages/react-debugmachine/package.json').version")
 echo "==> New version: $NEW_VERSION"
 
 node -e "
@@ -43,10 +45,10 @@ fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
 
 if [ "$DRY_RUN" = "--dry-run" ]; then
   echo "==> Dry run - publishing skipped"
-  pnpm -r publish --access public --no-git-checks --dry-run
+  pnpm --filter "./packages/react-debugmachine" publish --access public --no-git-checks --dry-run
 else
   echo "==> Publishing to npm"
-  pnpm -r publish --access public --no-git-checks
+  pnpm --filter "./packages/react-debugmachine" publish --access public --no-git-checks
 fi
 
 echo "==> Done. Published version $NEW_VERSION"

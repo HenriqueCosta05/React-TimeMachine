@@ -25,10 +25,10 @@ echo "==> Installing workspace dependencies"
 pnpm install
 
 if [ "$SKIP_BUILD" != "--skip-build" ]; then
-  echo "==> Building packages (shared, recorder, player)"
-  pnpm --filter "./packages/*" run build
+  echo "==> Building react-debugmachine wrapper package"
+  pnpm --filter "./packages/react-debugmachine" run build
 fi
 
 echo ""
 echo "==> Bootstrap complete."
-echo "Run 'pnpm dev' from application/ to start the demo app."
+echo "Install '@henriquecosta/react-debugmachine' in a consuming app, or run 'pnpm dev' from application/ to start the demo app."

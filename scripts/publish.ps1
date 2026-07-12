@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Version-bump and publish the publishable packages (shared, recorder, player) to npm.
+  Version-bump and publish the react-debugmachine wrapper package to npm.
 
 .EXAMPLE
   ./scripts/publish.ps1 -Bump 1.0.0
@@ -30,16 +30,18 @@ $app = Join-Path $root "application"
 
 Set-Location $app
 
+$wrapperFilter = "./packages/react-debugmachine..."
+
 Invoke-Checked "Installing dependencies" { pnpm install --frozen-lockfile }
-Invoke-Checked "Typecheck" { pnpm -r run typecheck }
-Invoke-Checked "Test" { pnpm -r run test }
-Invoke-Checked "Build" { pnpm -r run build }
-Invoke-Checked "Bumping version ($Bump) for publishable packages" {
-  pnpm --filter "./packages/*" exec -- npm version $Bump --no-git-tag-version
+Invoke-Checked "Typecheck" { pnpm --filter $wrapperFilter run typecheck }
+Invoke-Checked "Test" { pnpm --filter $wrapperFilter run test }
+Invoke-Checked "Build" { pnpm --filter $wrapperFilter run build }
+Invoke-Checked "Bumping version ($Bump) for wrapper package" {
+  pnpm --filter "./packages/react-debugmachine" exec -- npm version $Bump --no-git-tag-version
 }
 
-$sharedPkgPath = Join-Path $app "packages/shared/package.json"
-$newVersion = (Get-Content $sharedPkgPath -Raw | ConvertFrom-Json).version
+$wrapperPkgPath = Join-Path $app "packages/react-debugmachine/package.json"
+$newVersion = (Get-Content $wrapperPkgPath -Raw | ConvertFrom-Json).version
 Write-Host "==> New version: $newVersion"
 
 $rootPkgPath = Join-Path $app "package.json"
@@ -49,11 +51,11 @@ $rootPkg.version = $newVersion
 
 if ($DryRun) {
   Invoke-Checked "Dry run - publishing skipped" {
-    pnpm -r publish --access public --no-git-checks --dry-run
+    pnpm --filter "./packages/react-debugmachine" publish --access public --no-git-checks --dry-run
   }
 } else {
   Invoke-Checked "Publishing to npm" {
-    pnpm -r publish --access public --no-git-checks
+    pnpm --filter "./packages/react-debugmachine" publish --access public --no-git-checks
   }
 }
 
