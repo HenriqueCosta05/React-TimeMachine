@@ -94,4 +94,55 @@ describe("record then replay", () => {
 
     expect(replayContainer.textContent).toBe("count: 1");
   });
+
+  it("reproduces a prepend (out-of-order insert) into an existing list", async () => {
+    const { Recorder } = await import("@henriquecosta/react-debugmachine-recorder");
+    const recorder = new Recorder({ root: sourceContainer });
+    recorder.start();
+
+    const list = document.createElement("ul");
+    sourceContainer.appendChild(list);
+    const second = document.createElement("li");
+    second.textContent = "second";
+    list.appendChild(second);
+    await new Promise((resolve) => queueMicrotask(resolve));
+
+    const first = document.createElement("li");
+    first.textContent = "first";
+    list.insertBefore(first, second);
+    await new Promise((resolve) => queueMicrotask(resolve));
+
+    const recording = recorder.stop();
+    const player = new Player(recording);
+    player.seekTo(replayContainer, player.durationMs);
+
+    expect(replayContainer.innerHTML).toBe(sourceContainer.innerHTML);
+    expect(replayContainer.querySelector("ul")?.textContent).toBe("firstsecond");
+  });
+
+  it("reproduces removal of a node from the middle of a list", async () => {
+    const { Recorder } = await import("@henriquecosta/react-debugmachine-recorder");
+    const recorder = new Recorder({ root: sourceContainer });
+    recorder.start();
+
+    const list = document.createElement("ul");
+    sourceContainer.appendChild(list);
+    const items = ["first", "second", "third"].map((text) => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      list.appendChild(li);
+      return li;
+    });
+    await new Promise((resolve) => queueMicrotask(resolve));
+
+    list.removeChild(items[1]);
+    await new Promise((resolve) => queueMicrotask(resolve));
+
+    const recording = recorder.stop();
+    const player = new Player(recording);
+    player.seekTo(replayContainer, player.durationMs);
+
+    expect(replayContainer.innerHTML).toBe(sourceContainer.innerHTML);
+    expect(replayContainer.querySelector("ul")?.textContent).toBe("firstthird");
+  });
 });

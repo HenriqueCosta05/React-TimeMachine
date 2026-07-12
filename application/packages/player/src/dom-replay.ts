@@ -42,11 +42,23 @@ export function applyMutation(root: Node, payload: DomMutationPayload): void {
     return;
   }
 
-  // childList: replay only supports appends, matching the recorder's current
-  // capture (it doesn't record sibling position, so out-of-order inserts and
-  // removals can't be reconstructed exactly yet).
-  for (const snapshot of payload.addedNodes ?? []) {
-    target.appendChild(snapshotToNode(snapshot));
+  // childList: removals and inserts are applied positionally, anchored to
+  // `previousSiblingIndex`, so prepends, middle-of-list inserts, and removals
+  // land in the same place they did live. Both removal and insertion start
+  // right after that anchor — nothing before it is touched by this mutation,
+  // so the same index is valid before and after the removal step runs.
+  const startIndex = (payload.previousSiblingIndex ?? -1) + 1;
+
+  const removedNodes = payload.removedNodes ?? [];
+  for (let i = 0; i < removedNodes.length; i++) {
+    const child = target.childNodes[startIndex];
+    if (child) target.removeChild(child);
+  }
+
+  const addedNodes = payload.addedNodes ?? [];
+  const reference = target.childNodes[startIndex] ?? null;
+  for (const snapshot of addedNodes) {
+    target.insertBefore(snapshotToNode(snapshot), reference);
   }
 }
 

@@ -53,6 +53,9 @@ export interface DomMutationPayload {
   newValue?: string | null;
   addedNodes?: DomSnapshot[];
   removedNodes?: DomSnapshot[];
+  /** For `childList`: index of the target's child immediately before the
+   * added/removed range, or null if the range started at the first child. */
+  previousSiblingIndex?: number | null;
 }
 
 export interface DomMutationEvent extends BaseEvent {

@@ -4,8 +4,8 @@ Live backlog. Remove items when done — this is not a changelog.
 
 ## Now
 
-- [ ] Recorder: XHR interception (fetch-only today)
-- [ ] Player: childList replay only supports appends (no recorded sibling position, so out-of-order inserts/removals aren't reconstructed)
+- [X] Recorder: XHR interception (fetch-only today)
+- [X] Player: childList replay only supports appends (no recorded sibling position, so out-of-order inserts/removals aren't reconstructed)
 
 ## Next
 
@@ -16,7 +16,7 @@ Live backlog. Remove items when done — this is not a changelog.
 - [ ] Recording size/perf budget — long sessions must not bloat memory or the exported file
 
 ## Later / ideas
-
+- [ ] Make the project available as a helper dev plugin with modern UI
 - [ ] Browser extension wrapper (one-click record, no manual instrumentation)
 - [ ] Redux DevTools import (migrate existing users' action logs)
 - [ ] Diffing two recordings (before/after a fix) side by side

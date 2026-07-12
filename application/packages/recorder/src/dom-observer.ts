@@ -42,7 +42,22 @@ function toMutationPayload(root: Node, record: MutationRecord): DomMutationPaylo
     targetPath: pathFromRoot(root, record.target),
     addedNodes: Array.from(record.addedNodes).map(nodeToSnapshot),
     removedNodes: Array.from(record.removedNodes).map(nodeToSnapshot),
+    previousSiblingIndex: siblingIndex(record.target, record.previousSibling),
   };
+}
+
+/** `previousSibling` on a childList `MutationRecord` is a direct child of
+ * `target`, captured at the exact moment of that mutation — its index is
+ * what anchors replay to the right position, even for prepends or
+ * middle-of-list inserts/removals. Unlike `nextSibling`, its index relative
+ * to `target` doesn't shift as a result of *this* mutation (nothing before it
+ * changed), so it's safe to resolve against `target`'s children as observed
+ * when the batch callback runs. If it was itself removed later in the same
+ * batch it's no longer found and we fall back to null (treated as "start"). */
+function siblingIndex(target: Node, sibling: Node | null): number | null {
+  if (!sibling) return null;
+  const index = Array.prototype.indexOf.call(target.childNodes, sibling);
+  return index === -1 ? null : index;
 }
 
 /** MutationObserver callbacks are batched microtasks: by the time a batch runs,

@@ -74,4 +74,66 @@ describe("Recorder", () => {
     const mutations = recording.events.filter((event) => event.type === "dom-mutation");
     expect(mutations.length).toBeGreaterThan(0);
   });
+
+  it("captures network-request/response events for XHR calls, not just fetch", async () => {
+    // jsdom's real XMLHttpRequest would attempt an actual network call, which
+    // is flaky/unavailable in CI. Swap in a minimal fake that mimics the
+    // open/setRequestHeader/send/loadend contract our hook relies on.
+    class FakeXMLHttpRequest extends EventTarget {
+      status = 200;
+      responseType = "";
+      responseText = '{"ok":true}';
+      private method = "";
+      private url = "";
+
+      open(method: string, url: string) {
+        this.method = method;
+        this.url = url;
+      }
+
+      setRequestHeader(_name: string, _value: string) {}
+
+      getAllResponseHeaders() {
+        return "content-type: application/json\r\n";
+      }
+
+      send() {
+        queueMicrotask(() => this.dispatchEvent(new Event("loadend")));
+      }
+    }
+
+    const OriginalXHR = window.XMLHttpRequest;
+    window.XMLHttpRequest = FakeXMLHttpRequest as unknown as typeof XMLHttpRequest;
+
+    const { Recorder } = await import("../src/recorder");
+    const recorder = new Recorder({ root: container });
+    recorder.start();
+
+    await new Promise<void>((resolve) => {
+      const xhr = new window.XMLHttpRequest();
+      xhr.open("GET", "https://example.com/api/ping");
+      xhr.setRequestHeader("X-Test", "1");
+      xhr.addEventListener("loadend", () => resolve());
+      xhr.send();
+    });
+
+    const recording = recorder.stop();
+    window.XMLHttpRequest = OriginalXHR;
+
+    const requests = recording.events.filter((event) => event.type === "network-request");
+    const responses = recording.events.filter((event) => event.type === "network-response");
+
+    expect(requests.length).toBe(1);
+    expect(requests[0].payload).toMatchObject({
+      method: "GET",
+      url: "https://example.com/api/ping",
+      headers: { "X-Test": "1" },
+    });
+    expect(responses.length).toBe(1);
+    expect(responses[0].payload).toMatchObject({
+      requestId: requests[0].payload.requestId,
+      status: 200,
+      body: '{"ok":true}',
+    });
+  });
 });
