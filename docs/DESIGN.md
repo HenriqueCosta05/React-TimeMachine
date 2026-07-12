@@ -3,7 +3,7 @@
 Concrete tokens and component rules, not a mood board. This file should be
 usable directly by a UI-generation tool.
 
-> Status: placeholder tokens for the `apps/web` viewer and timeline scrubber. No UI has been built yet — swap these for real brand decisions before implementation.
+> Status: the `devtools` package (`TimeMachineDevtools` panel) is built and its tokens/specs below are real, taken directly from `application/packages/devtools/src/TimeMachineDevtools.tsx`. The `apps/web` shareable-link viewer is still unbuilt — its section stays placeholder until that app exists.
 
 ## Brand
 
@@ -15,22 +15,27 @@ usable directly by a UI-generation tool.
   - dramatic: the shareable-link viewer is the "wow" moment — full-bleed
     player, minimal surrounding chrome
 
-## Color tokens
+## Color tokens — `devtools` panel (implemented)
 
 | Token | Value | Usage |
 |---|---|---|
-| `color-primary` | `#6366F1` | scrubber playhead, primary buttons, links |
-| `color-secondary` | `#22D3EE` | network-event markers on the timeline |
-| `color-bg` | `#0B0F19` | app background (dark by default — this is a dev tool) |
-| `color-error` | `#F43F5E` | error events / thrown exceptions on the timeline |
+| `color-bg` | `#09090b` | panel base background |
+| `color-surface` | `rgba(24, 24, 27, 0.9)` | toggle + panel surface, blurred (`backdrop-filter: blur`) |
+| `color-border` | `rgba(255, 255, 255, 0.08)` | hairline borders on toggle, panel, rows, panes |
+| `color-text` | `#fafafa` | primary text |
+| `color-muted` | `#a1a1aa` | labels, timestamps, eyebrow text |
+| `color-blue` | `#3b82f6` | primary action (record), selected-row highlight, scrubber accent |
+| `color-red` | `#ef4444` | destructive action (stop) |
+| `shadow` | `0 24px 80px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.25)` | toggle + panel elevation |
+| diff add | `#4ade80` | `+` lines in the per-event diff pane |
+| diff remove | `#f87171` | `-` lines in the per-event diff pane |
 
-## Typography
+## Typography — `devtools` panel (implemented)
 
-| Role | Font | Size | Weight |
+| Role | Font stack | Size | Weight |
 |---|---|---|---|
-| Heading 1 | Inter | 28px | 600 |
-| Body | Inter | 14px | 400 |
-| Monospace (event data, timestamps) | JetBrains Mono | 13px | 400 |
+| UI text (titles, labels, buttons) | `Inter, system-ui, sans-serif` | 18px (title) / 13px (body) / 12px (labels) | 700 (title) / 600 (buttons) / 400 (body) |
+| Monospace (raw JSON, diff lines) | `"JetBrains Mono", SFMono-Regular, Consolas, monospace` | 12–13px | 400 |
 
 ## Spacing scale
 
@@ -38,17 +43,40 @@ usable directly by a UI-generation tool.
 
 ## Component specs
 
-### Timeline scrubber
+### Time Machine devtools panel (implemented — `packages/devtools`)
 
-- Variants: full-width (viewer page), compact (embedded in recorder overlay)
-- States: default, dragging (playhead follows cursor), event-hover (tooltip
-  with event type + timestamp)
-- Do: mark state/DOM/network events as distinct colored ticks on the same
-  timeline so a viewer can see causality at a glance
-- Don't: collapse different event types into one generic "event" marker — the
-  whole value is seeing state vs. DOM vs. network correlate in time
+- **Toggle**: fixed bottom-right circle, 50×50, `⏱`, `zIndex: 2147483647` —
+  always above host app chrome. Next.js-dev-indicator style: closed by
+  default, click to open/close.
+- **Panel**: near-fullscreen card (`top/left/right/bottom` inset by
+  `4vh`/`2vw`), not a small popover — the interactions list and JSON detail
+  pane both need real room. Opening the panel covers the host app; close it
+  (click the toggle again) to interact with the app underneath while a
+  recording continues in the background.
+- **Header**: title + eyebrow ("session recorder & debugger"), record/stop
+  button (`color-blue` when idle+`root` set, `color-red` mid-recording,
+  disabled/dimmed when `root` is null), state + interaction count label.
+- **Interactions pane** (left, 420px fixed): virtualized list (44px rows,
+  4-row overscan), one row per deduped event — type tag (`STATE`/`DOM`/`REQ
+  →`/`RES ←`), one-line description, timestamp. Selecting a row seeks the
+  replay to that event's timestamp.
+- **Debug pane** (right, flexible): visible once `state === "stopped"` —
+  timeline scrubber (`<input type="range">`, `color-blue` accent), live
+  replay preview (`replayRef` target), per-event diff (`+`/`-`/info lines,
+  green/red/muted) with a collapsible raw-JSON `<details>`.
+- Do: keep state/DOM/network event types visually distinct (tag + color) so
+  causality across types is scannable at a glance.
+- Don't: let the panel intercept clicks on the host app while open — that's
+  why it's close-then-interact, not an overlay you can partially see through.
 
-### Replay viewer (apps/web)
+### Timeline scrubber (implemented, inside the devtools debug pane)
+
+- States: default, dragging (native range input), disabled (hidden entirely
+  until `state === "stopped"`, since there's nothing to scrub mid-recording)
+- Do: pair every scrub with an immediate `player.seekTo` — no debounce, no
+  loading state, scrubbing must feel instant
+
+### Replay viewer (apps/web — still placeholder, not built)
 
 - Variants: standalone shared-link page, embedded (iframe) for future
   ticket/PR integrations
@@ -58,10 +86,3 @@ usable directly by a UI-generation tool.
   the replay itself is the product moment
 - Don't: gate the first view behind a signup wall — the shareable link is the
   adoption mechanism, friction here kills virality
-
-### Record button (recorder overlay)
-
-- Variants: idle, recording (pulsing `color-error` dot), stopped
-- States: default, hover, disabled (already recording)
-- Do: keep it a small fixed-position overlay, dev-tool style
-- Don't: interfere with the host app's own UI or z-index stack

@@ -145,7 +145,55 @@ function TimelineScrubber({ recording }: { recording: Recording }) {
 
 Dragging the scrubber to just before the hang and reading `network` directly shows a request whose `response` stays `null` — the `/api/orders` call that never resolved, without needing to reproduce the bug or add temporary logging.
 
-## 4. Split-package install (advanced)
+## 4. Batteries-included: drop in the devtools panel
+
+Most of the time you don't want to hand-build a recorder button, a scrub
+input, and a diff viewer yourself — `@henriquecosta/react-debugmachine-devtools`
+gives you all of that as one component:
+
+```bash
+npm install @henriquecosta/react-debugmachine-devtools
+```
+
+```tsx
+import { useState } from "react";
+import { TimeMachineDevtools } from "@henriquecosta/react-debugmachine-devtools";
+
+function App() {
+  const [recordedRoot, setRecordedRoot] = useState<HTMLElement | null>(null);
+
+  return (
+    <div ref={setRecordedRoot}>
+      <CartStep />
+      <ShippingStep />
+      <PaymentStep />
+      <TimeMachineDevtools root={recordedRoot} />
+    </div>
+  );
+}
+```
+
+This renders a fixed bottom-right toggle (closed by default). Clicking it
+opens a near-fullscreen panel: record, reproduce the bug, stop, then scrub
+the timeline, click any interaction to see its state/DOM diff, or expand the
+raw JSON — no `Recorder`/`Player` wiring of your own required. Close the
+panel (click the toggle again) to interact with the app underneath while a
+recording keeps running in the background.
+
+Need a custom UI instead of the built-in panel? Pass `builtInUI={false}` and
+drive the same primitives directly via the `useTimeMachine` hook it's built
+on:
+
+```tsx
+import { useTimeMachine } from "@henriquecosta/react-debugmachine-devtools";
+
+const timeMachine = useTimeMachine({ root: recordedRoot });
+// timeMachine.state, .events, .durationMs, .scrubMs
+// timeMachine.start() / .stop() / .seek(ms)
+// timeMachine.replayRef — ref callback for whichever element renders the replay
+```
+
+## 5. Split-package install (advanced)
 
 Most apps should use the wrapper. Install the underlying packages directly only if you need to tree-shake out the recorder in a viewer-only bundle, or the player in a recorder-only agent bundle:
 

@@ -1,6 +1,6 @@
 # Architecture & Walkthrough
 
-> Status: `shared`, `recorder`, and `player` are implemented and tested in `application/packages/`, wired together live in `application/apps/demo`. `video-exporter` and `apps/web` are not started — this section still describes the target design for those.
+> Status: `shared`, `recorder`, `player`, and `devtools` are implemented and tested in `application/packages/`, wired together live in `application/apps/demo` (minimal) and `application/apps/complex-demo` (mock chat app, busier component tree). `video-exporter` and `apps/web` are not started — this section still describes the target design for those.
 
 ## Overview
 
@@ -39,6 +39,20 @@ the source of truth for both live scrubbing and offline video rendering, so
 - Location: `packages/player/`
 - Depends on: shared
 
+### devtools
+
+- Responsibility: batteries-included debug UI — a fixed bottom-right toggle
+  (Next.js-dev-indicator style) that opens a near-full-screen panel with a
+  virtualized interactions list, timeline scrubber, live replay preview, and
+  per-event JSON/diff pane. `useTimeMachine` is the underlying hook
+  (record/stop/seek + replay ref) for apps that want a fully custom UI on the
+  same primitives instead of the built-in panel.
+- Location: `packages/devtools/`
+- Key files: `TimeMachineDevtools.tsx` — the built-in panel;
+  `use-time-machine.ts` — `Recorder`/`Player` wiring exposed as a hook
+- Depends on: recorder, player, shared
+- Used by: `apps/demo` and `apps/complex-demo`
+
 ### video-exporter
 
 - Responsibility: drive `player` headlessly (Playwright) and capture frames to
@@ -61,7 +75,10 @@ the source of truth for both live scrubbing and offline video rendering, so
 2. On stop, the event log is serialized (via `shared`'s schema) to a single
    recording file
 3. **Scrub path**: `player` loads the recording client-side, lets a user drag a
-   timeline scrubber to any point, re-applying events up to that point
+   timeline scrubber to any point, re-applying events up to that point —
+   `devtools`'s `TimeMachineDevtools` panel is the concrete built-in
+   implementation of this path today (record → stop → scrub, all in one
+   floating overlay, no separate viewer app needed)
 4. **Video path**: `video-exporter` loads the same recording into a headless
    browser via Playwright, drives `player` frame-by-frame, and captures each
    frame into an MP4

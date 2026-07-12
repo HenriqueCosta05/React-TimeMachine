@@ -4,9 +4,7 @@ Live backlog. Remove items when done — this is not a changelog.
 
 ## Now
 
-- [X] Recorder: XHR interception (fetch-only today)
-- [X] Player: childList replay only supports appends (no recorded sibling position, so out-of-order inserts/removals aren't reconstructed)
-- [x] Demo: Create more complex demo react apps to simulate different behaviours.
+- [ ] Wire Playwright into `pnpm test`/CI as a real E2E suite — right now it's only used ad hoc (e.g. scripting `apps/complex-demo` to record a demo video), see docs/testing.md
 
 ## Next
 

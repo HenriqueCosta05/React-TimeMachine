@@ -5,7 +5,13 @@ All notable changes to the React Time Machine packages. Versions below refer to 
 ## Unreleased
 
 ### Added
-- `docs/EXAMPLES.md` — worked usage examples against a realistic checkout-flow app: recording a bug report, replaying it in a viewer, scrubbing the timeline to inspect per-timestamp component state and network activity, and split-package installs for tree-shaking.
+- `@henriquecosta/react-debugmachine-devtools` package (`application/packages/devtools/`) — batteries-included debug UI: a fixed bottom-right toggle opening a near-fullscreen panel with a virtualized interactions list, timeline scrubber, live replay preview, and per-event JSON/diff pane. Exports `TimeMachineDevtools` (the panel, `builtInUI={false}` to opt out) and `useTimeMachine` (the underlying record/stop/seek hook for a fully custom UI).
+- `application/apps/complex-demo` — mock chat app (conversations, streaming-style mock AI replies, message editing/regeneration) used to dogfood `devtools` against a busier, more realistic component tree than `apps/demo`.
+- XHR interception in `recorder`'s `network-hook.ts` (previously fetch-only), with direct tests.
+- `docs/EXAMPLES.md` — worked usage examples against a realistic checkout-flow app: recording a bug report, replaying it in a viewer, scrubbing the timeline to inspect per-timestamp component state and network activity, the batteries-included devtools panel, and split-package installs for tree-shaking.
+
+### Fixed
+- Player's `childList` DOM mutation replay only supported appends, so out-of-order inserts and removals couldn't be reconstructed. `dom-observer.ts` now records `previousSiblingIndex` (the target's child immediately before the mutated range, from `MutationRecord.previousSibling`) and `dom-replay.ts` anchors both removal and insertion to it via `insertBefore`/positional `removeChild` — prepends, middle-of-list inserts, and removals now replay in the same position they happened live.
 
 ## [1.0.2] — wrapper package
 

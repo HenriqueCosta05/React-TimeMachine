@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTimeMachine } from "./use-time-machine";
-import type { TimeMachineEvent } from "@henriquecosta/react-debugmachine-shared";
+import type { DomSnapshot, TimeMachineEvent } from "@henriquecosta/react-debugmachine-shared";
 
 export interface TimeMachineDevtoolsProps {
   /** Element being recorded. */
@@ -206,7 +206,7 @@ const rowBaseStyle: CSSProperties = {
 
 const rowSelectedStyle: CSSProperties = {
   background: "rgba(59,130,246,.12)",
-  borderColor: "rgba(59,130,246,.28)",
+  border: "1px solid rgba(59,130,246,.28)",
   boxShadow: "inset 3px 0 " + colors.blue,
 };
 
@@ -263,33 +263,146 @@ const jsonStyle: CSSProperties = {
   minHeight: 150,
 };
 
-function eventLabel(event: TimeMachineEvent): string {
-  switch (event.type) {
-    case "state-diff":
-      return event.payload.componentName;
-    case "dom-mutation":
-      return event.payload.kind;
-    case "network-request":
-      return `${event.payload.method} ${event.payload.url}`;
-    case "network-response":
-      return `${event.payload.status}`;
-    default:
-      return "";
+const diffTitleStyle: CSSProperties = {
+  margin: 0,
+  fontSize: 14,
+  fontWeight: 600,
+};
+
+const diffBoxStyle: CSSProperties = {
+  overflow: "auto",
+  padding: 12,
+  borderRadius: 14,
+  border: `1px solid ${colors.border}`,
+  background: "#050505",
+  fontSize: 12,
+  lineHeight: 1.8,
+  fontFamily: monoFontFamily,
+  minHeight: 60,
+};
+
+const diffAddLineStyle: CSSProperties = { color: "#4ade80" };
+const diffRemoveLineStyle: CSSProperties = { color: "#f87171" };
+const diffInfoLineStyle: CSSProperties = { color: colors.muted };
+
+const detailsStyle: CSSProperties = { margin: 0 };
+const detailsSummaryStyle: CSSProperties = { ...labelStyle, cursor: "pointer" };
+
+/** One line of a human-readable diff: `add`/`remove` render with +/- and are
+ * colored; `info` is a neutral supporting line (e.g. a response's duration). */
+interface DiffLine {
+  op: "add" | "remove" | "info";
+  text: string;
+}
+
+function truncate(value: string, max = 80): string {
+  return value.length > max ? `${value.slice(0, max)}…` : value;
+}
+
+function formatValue(value: unknown): string {
+  if (value === undefined) return "undefined";
+  if (typeof value === "string") return truncate(value);
+  try {
+    return truncate(JSON.stringify(value));
+  } catch {
+    return String(value);
   }
 }
 
-function typeTag(type: TimeMachineEvent["type"]): string {
-  switch (type) {
-    case "state-diff":
-      return "STATE";
-    case "dom-mutation":
-      return "DOM";
+function summarizeSnapshot(node: DomSnapshot): string {
+  return node.kind === "text" ? `"${truncate(node.text)}"` : `<${node.tag}>`;
+}
+
+/** Per-component prop/state values as of just before a given `state-diff`
+ * event — `changedProps`/`changedState` only carry the *new* values, so this
+ * is what turns them into an actual before/after diff instead of a one-sided
+ * dump. Indexed in parallel with the (deduped) event list. */
+function computeBeforeStates(
+  events: TimeMachineEvent[],
+): Array<{ props: Record<string, unknown>; state: Record<string, unknown> } | null> {
+  const propsByComponent = new Map<string, Record<string, unknown>>();
+  const stateByComponent = new Map<string, Record<string, unknown>>();
+
+  return events.map((event) => {
+    if (event.type !== "state-diff") return null;
+    const { componentId, changedProps, changedState } = event.payload;
+    const beforeProps = propsByComponent.get(componentId) ?? {};
+    const beforeState = stateByComponent.get(componentId) ?? {};
+    propsByComponent.set(componentId, { ...beforeProps, ...changedProps });
+    stateByComponent.set(componentId, { ...beforeState, ...changedState });
+    return { props: beforeProps, state: beforeState };
+  });
+}
+
+/** Human-readable title + diff lines for one event. `before` is only present
+ * (and only meaningful) for `state-diff` events — see `computeBeforeStates`. */
+function describeEvent(
+  event: TimeMachineEvent,
+  before: { props: Record<string, unknown>; state: Record<string, unknown> } | null,
+): { title: string; lines: DiffLine[] } {
+  switch (event.type) {
+    case "state-diff": {
+      const lines: DiffLine[] = [];
+      for (const [key, value] of Object.entries(event.payload.changedProps)) {
+        const previous = before?.props[key];
+        if (previous !== undefined) lines.push({ op: "remove", text: `prop ${key}: ${formatValue(previous)}` });
+        lines.push({ op: "add", text: `prop ${key}: ${formatValue(value)}` });
+      }
+      for (const [key, value] of Object.entries(event.payload.changedState)) {
+        const previous = before?.state[key];
+        if (previous !== undefined) lines.push({ op: "remove", text: `state[${key}]: ${formatValue(previous)}` });
+        lines.push({ op: "add", text: `state[${key}]: ${formatValue(value)}` });
+      }
+      return { title: `${event.payload.componentName} re-rendered`, lines };
+    }
+    case "dom-mutation": {
+      const { payload } = event;
+      if (payload.kind === "attributes") {
+        return {
+          title: `attribute "${payload.attributeName}" changed`,
+          lines: [
+            { op: "remove", text: formatValue(payload.oldValue) },
+            { op: "add", text: formatValue(payload.newValue) },
+          ],
+        };
+      }
+      if (payload.kind === "characterData") {
+        return {
+          title: "text changed",
+          lines: [
+            { op: "remove", text: formatValue(payload.oldValue) },
+            { op: "add", text: formatValue(payload.newValue) },
+          ],
+        };
+      }
+      const added = payload.addedNodes ?? [];
+      const removed = payload.removedNodes ?? [];
+      return {
+        title: `${added.length} node(s) added, ${removed.length} removed`,
+        lines: [
+          ...removed.map((node): DiffLine => ({ op: "remove", text: summarizeSnapshot(node) })),
+          ...added.map((node): DiffLine => ({ op: "add", text: summarizeSnapshot(node) })),
+        ],
+      };
+    }
     case "network-request":
-      return "REQ →";
+      return {
+        title: `${event.payload.method} ${event.payload.url}`,
+        lines: [
+          { op: "info", text: `${Object.keys(event.payload.headers).length} header(s)` },
+          { op: "info", text: `body: ${event.payload.body ? truncate(event.payload.body) : "(none)"}` },
+        ],
+      };
     case "network-response":
-      return "RES ←";
+      return {
+        title: `responded ${event.payload.status}`,
+        lines: [
+          { op: "info", text: `${Math.round(event.payload.durationMs)}ms` },
+          { op: "info", text: `body: ${event.payload.body ? truncate(event.payload.body) : "(none)"}` },
+        ],
+      };
     default:
-      return "";
+      return { title: "", lines: [] };
   }
 }
 
@@ -311,6 +424,41 @@ function safeStringify(value: unknown): string {
   );
 }
 
+/** Recorded events can carry back-to-back exact duplicates (e.g. a no-op
+ * commit re-emitting the same diff, or a batched mutation observed twice) —
+ * collapse adjacent events with an identical type+payload down to one, since
+ * they represent the same interaction, not two. Only adjacent duplicates are
+ * merged; the same payload recurring later for a genuinely separate
+ * interaction is left alone. Payloads can hold circular hook-effect linked
+ * lists, so the signature is built with `safeStringify`, not raw
+ * `JSON.stringify`. */
+function dedupeEvents(events: TimeMachineEvent[]): TimeMachineEvent[] {
+  const deduped: TimeMachineEvent[] = [];
+  let previousSignature: string | null = null;
+  for (const event of events) {
+    const signature = `${event.type}:${safeStringify(event.payload)}`;
+    if (signature === previousSignature) continue;
+    deduped.push(event);
+    previousSignature = signature;
+  }
+  return deduped;
+}
+
+function typeTag(type: TimeMachineEvent["type"]): string {
+  switch (type) {
+    case "state-diff":
+      return "STATE";
+    case "dom-mutation":
+      return "DOM";
+    case "network-request":
+      return "REQ →";
+    case "network-response":
+      return "RES ←";
+    default:
+      return "";
+  }
+}
+
 /** Batteries-included debug UI: a Next.js-dev-indicator-style toggle fixed to
  * the bottom-right corner, closed by default — click to reveal a near-full-
  * screen panel with a virtualized interactions list, a timeline scrubber, a
@@ -325,7 +473,9 @@ export function TimeMachineDevtools({ root, builtInUI = true }: TimeMachineDevto
   const listRef = useRef<HTMLDivElement | null>(null);
 
   const timeMachine = useTimeMachine({ root });
-  const { events } = timeMachine;
+
+  const dedupedEvents = useMemo(() => dedupeEvents(timeMachine.events), [timeMachine.events]);
+  const beforeStates = useMemo(() => computeBeforeStates(dedupedEvents), [dedupedEvents]);
 
   useEffect(() => {
     const node = listRef.current;
@@ -340,14 +490,20 @@ export function TimeMachineDevtools({ root, builtInUI = true }: TimeMachineDevto
 
   const visible = useMemo(() => {
     const start = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
-    const end = Math.min(events.length, Math.ceil((scrollTop + listHeight) / ROW_HEIGHT) + OVERSCAN);
+    const end = Math.min(
+      dedupedEvents.length,
+      Math.ceil((scrollTop + listHeight) / ROW_HEIGHT) + OVERSCAN,
+    );
     return { start, end };
-  }, [scrollTop, listHeight, events.length]);
+  }, [scrollTop, listHeight, dedupedEvents.length]);
 
-  const selectedEvent = selectedIndex !== null ? events[selectedIndex] : null;
+  const selectedEvent = selectedIndex !== null ? dedupedEvents[selectedIndex] : null;
+  const selectedDescription = selectedEvent
+    ? describeEvent(selectedEvent, (selectedIndex !== null ? beforeStates[selectedIndex] : null) ?? null)
+    : null;
 
   const selectRow = (index: number) => {
-    const event = events[index];
+    const event = dedupedEvents[index];
     if (!event) return;
     setSelectedIndex(index);
     timeMachine.seek(event.timestamp);
@@ -389,7 +545,7 @@ export function TimeMachineDevtools({ root, builtInUI = true }: TimeMachineDevto
                 </button>
               )}
               <span style={labelStyle}>
-                {timeMachine.state} · {timeMachine.eventCount} events
+                {timeMachine.state} · {dedupedEvents.length} interaction{dedupedEvents.length === 1 ? "" : "s"}
               </span>
             </div>
           </div>
@@ -402,8 +558,8 @@ export function TimeMachineDevtools({ root, builtInUI = true }: TimeMachineDevto
                 style={listStyle}
                 onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
               >
-                <div style={{ position: "relative", height: events.length * ROW_HEIGHT }}>
-                  {events.slice(visible.start, visible.end).map((event, offset) => {
+                <div style={{ position: "relative", height: dedupedEvents.length * ROW_HEIGHT }}>
+                  {dedupedEvents.slice(visible.start, visible.end).map((event, offset) => {
                     const index = visible.start + offset;
                     return (
                       <button
@@ -418,7 +574,9 @@ export function TimeMachineDevtools({ root, builtInUI = true }: TimeMachineDevto
                         onClick={() => selectRow(index)}
                       >
                         <span style={rowTagStyle}>{typeTag(event.type)}</span>
-                        <span style={rowLabelStyle}>{eventLabel(event)}</span>
+                        <span style={rowLabelStyle}>
+                          {describeEvent(event, beforeStates[index] ?? null).title}
+                        </span>
                         <span style={rowTimeStyle}>{Math.round(event.timestamp)}ms</span>
                       </button>
                     );
@@ -447,9 +605,37 @@ export function TimeMachineDevtools({ root, builtInUI = true }: TimeMachineDevto
                     {Math.round(timeMachine.scrubMs)}ms / {Math.round(timeMachine.durationMs)}ms
                   </p>
                   <div ref={timeMachine.replayRef} style={replayStyle} />
-                  <pre style={jsonStyle}>
-                    {selectedEvent ? safeStringify(selectedEvent) : "select an interaction"}
-                  </pre>
+                  {selectedEvent && selectedDescription ? (
+                    <>
+                      <p style={diffTitleStyle}>{selectedDescription.title}</p>
+                      <div style={diffBoxStyle}>
+                        {selectedDescription.lines.length === 0 && (
+                          <div style={diffInfoLineStyle}>no field-level changes</div>
+                        )}
+                        {selectedDescription.lines.map((line, index) => (
+                          <div
+                            key={index}
+                            style={
+                              line.op === "add"
+                                ? diffAddLineStyle
+                                : line.op === "remove"
+                                  ? diffRemoveLineStyle
+                                  : diffInfoLineStyle
+                            }
+                          >
+                            {line.op === "add" ? "+ " : line.op === "remove" ? "- " : ""}
+                            {line.text}
+                          </div>
+                        ))}
+                      </div>
+                      <details style={detailsStyle}>
+                        <summary style={detailsSummaryStyle}>raw JSON</summary>
+                        <pre style={jsonStyle}>{safeStringify(selectedEvent)}</pre>
+                      </details>
+                    </>
+                  ) : (
+                    <p style={labelStyle}>select an interaction</p>
+                  )}
                 </>
               ) : (
                 <p style={labelStyle}>record, then stop, to inspect interactions</p>

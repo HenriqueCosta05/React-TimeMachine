@@ -10,11 +10,15 @@ packages/
   recorder/             @henriquecosta/react-debugmachine-recorder
   player/                @henriquecosta/react-debugmachine-player
   react-debugmachine/   @henriquecosta/react-debugmachine (wrapper — re-exports the three above)
+  devtools/              @henriquecosta/react-debugmachine-devtools (built-in record/replay UI panel)
 apps/
-  demo/                 sample app, consumes recorder + player directly
+  demo/                 minimal sample app, consumes recorder + player directly
+  complex-demo/          mock chat app, consumes devtools' TimeMachineDevtools component
 ```
 
 `react-debugmachine` has no implementation of its own — it only re-exports `Recorder`, `Player`, and the shared event schema, so external consumers install one package instead of three. `shared`, `recorder`, and `player` are still published independently since `react-debugmachine` depends on them via `workspace:*`, which pnpm resolves to real semver ranges on publish.
+
+`devtools` is a separate install from the wrapper — it depends directly on `recorder`, `player`, and `shared` (not on `react-debugmachine`) and exports `TimeMachineDevtools` (the batteries-included panel) plus the underlying `useTimeMachine` hook for building a custom UI on the same primitives.
 
 ## Setup
 
@@ -29,6 +33,12 @@ pnpm dev          # run apps/demo (rsbuild dev server) with the recorder attache
 pnpm build        # build all packages
 pnpm test         # test all packages
 pnpm typecheck    # typecheck all packages
+```
+
+To run `complex-demo` (the chat app dogfooding `TimeMachineDevtools`) instead:
+
+```bash
+pnpm --filter complex-demo dev   # rsbuild dev server on http://localhost:3000
 ```
 
 Scope any command to a single package with `--filter`:
