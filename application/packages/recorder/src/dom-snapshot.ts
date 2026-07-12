@@ -1,4 +1,4 @@
-import type { DomSnapshot } from "@react-debugmachine/shared";
+import type { DomSnapshot } from "@henriquecosta/react-debugmachine-shared";
 
 /** Recursively serializes a live DOM node into a structural snapshot. Unlike
  * `outerHTML`, this never merges adjacent text nodes, so indices computed

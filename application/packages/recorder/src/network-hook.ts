@@ -1,4 +1,4 @@
-import type { NetworkRequestPayload, NetworkResponsePayload } from "@react-debugmachine/shared";
+import type { NetworkRequestPayload, NetworkResponsePayload } from "@henriquecosta/react-debugmachine-shared";
 import type { RecordingClock } from "./clock";
 
 function headersToRecord(headers: Headers): Record<string, string> {

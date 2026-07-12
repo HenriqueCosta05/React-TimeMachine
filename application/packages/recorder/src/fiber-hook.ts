@@ -1,4 +1,4 @@
-import type { StateDiffPayload } from "@react-debugmachine/shared";
+import type { StateDiffPayload } from "@henriquecosta/react-debugmachine-shared";
 import type { RecordingClock } from "./clock";
 import type { Fiber, FiberRoot, HookNode, ReactDevToolsGlobalHook } from "./fiber-types";
 

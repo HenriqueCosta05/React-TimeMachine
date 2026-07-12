@@ -1,4 +1,4 @@
-import type { DomMutationPayload, DomSnapshot } from "@react-debugmachine/shared";
+import type { DomMutationPayload, DomSnapshot } from "@henriquecosta/react-debugmachine-shared";
 
 function snapshotToNode(snapshot: DomSnapshot): Node {
   if (snapshot.kind === "text") return document.createTextNode(snapshot.text);

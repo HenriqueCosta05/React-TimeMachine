@@ -3,7 +3,7 @@ import {
   type DomSnapshot,
   type Recording,
   type TimeMachineEvent,
-} from "@react-debugmachine/shared";
+} from "@henriquecosta/react-debugmachine-shared";
 import { RecordingClock } from "./clock";
 import { installDomObserver } from "./dom-observer";
 import { nodeToSnapshot } from "./dom-snapshot";

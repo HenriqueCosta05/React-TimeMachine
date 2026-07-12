@@ -400,10 +400,10 @@ importers:
 
   apps/demo:
     dependencies:
-      '@react-debugmachine/player':
+      '@henriquecosta/react-debugmachine-player':
         specifier: workspace:*
         version: link:../../packages/player
-      '@react-debugmachine/recorder':
+      '@henriquecosta/react-debugmachine-recorder':
         specifier: workspace:*
         version: link:../../packages/recorder
       react:
@@ -434,11 +434,11 @@ importers:
 
   packages/player:
     dependencies:
-      '@react-debugmachine/shared':
+      '@henriquecosta/react-debugmachine-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
-      '@react-debugmachine/recorder':
+      '@henriquecosta/react-debugmachine-recorder':
         specifier: workspace:*
         version: link:../recorder
       jsdom:
@@ -453,7 +453,7 @@ importers:
 
   packages/recorder:
     dependencies:
-      '@react-debugmachine/shared':
+      '@henriquecosta/react-debugmachine-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:

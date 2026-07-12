@@ -9,8 +9,8 @@
     "preview": "rsbuild preview"
   },
   "dependencies": {
-    "@react-debugmachine/player": "workspace:*",
-    "@react-debugmachine/recorder": "workspace:*",
+    "@henriquecosta/react-debugmachine-player": "workspace:*",
+    "@henriquecosta/react-debugmachine-recorder": "workspace:*",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },

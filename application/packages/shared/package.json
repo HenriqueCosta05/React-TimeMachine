@@ -1,5 +1,5 @@
 {
-  "name": "@react-debugmachine/shared",
+  "name": "@henriquecosta/react-debugmachine-shared",
   "version": "1.0.0",
   "description": "Event schema and serialization format shared by recorder and player.",
   "main": "./dist/index.js",

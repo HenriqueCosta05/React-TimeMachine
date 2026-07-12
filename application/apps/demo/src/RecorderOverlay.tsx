@@ -1,5 +1,5 @@
-import { Recorder } from '@react-debugmachine/recorder';
-import { Player } from '@react-debugmachine/player';
+import { Recorder } from '@henriquecosta/react-debugmachine-recorder';
+import { Player } from '@henriquecosta/react-debugmachine-player';
 import { useRef, useState } from 'react';
 
 type RecordingState = 'idle' | 'recording' | 'stopped';

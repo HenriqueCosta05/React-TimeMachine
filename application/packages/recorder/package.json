@@ -1,5 +1,5 @@
 {
-  "name": "@react-debugmachine/recorder",
+  "name": "@henriquecosta/react-debugmachine-recorder",
   "version": "1.0.0",
   "description": "Captures state/props diffs, DOM mutations, and network activity into one ordered event log.",
   "main": "./dist/index.js",
@@ -30,7 +30,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@react-debugmachine/shared": "workspace:*"
+    "@henriquecosta/react-debugmachine-shared": "workspace:*"
   },
   "devDependencies": {
     "jsdom": "^29.1.1",
