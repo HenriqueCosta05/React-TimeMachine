@@ -2,13 +2,13 @@
 
 | Campo | Valor |
 |---|---|
-| **Status** | `Rascunho` |
-| **Versão** | v0.1 |
+| **Status** | `Revisado` |
+| **Versão** | v2.0 |
 | **Autor / Owner** | Henrique Costa |
-| **Revisores** | — |
-| **Última atualização** | 2026-07-23 |
-| **Release alvo** | — |
-| **Links rápidos** | [Repo](https://github.com/HenriqueCosta05/React-Debug-Machine) · [Design](../docs/DESIGN.md) · [Board](../TODO.md) · [Métricas](#) |
+| **Revisores** | Henrique Costa |
+| **Última atualização** | 2026-07-24 |
+| **Release alvo** | 2026-07-31 |
+| **Links rápidos** | [Repo](https://github.com/HenriqueCosta05/React-Debug-Machine) · [Design](../docs/DESIGN.md) · [Board](../TODO.md)|
 
 > Este é um documento vivo. Atualize junto com as decisões, não depois.
 
@@ -20,29 +20,24 @@
 React Debug Machine é um debugger runtime unificado para apps React: correlaciona, num só painel, eventos de DOM, mudanças de estado (React, Redux, TanStack), logs de console, requisições/respostas de API e diagnósticos de tipagem TypeScript.
 
 ### 1.2 Problema
-Hoje, debugar um app React exige alternar entre ferramentas isoladas que não se falam: React DevTools para a árvore de componentes, Redux DevTools (ou equivalente) para estado, a aba Network do navegador para requisições, o console para logs, e o editor/`tsc` para erros de tipo. Nenhuma delas responde à pergunta "esse erro de tipo veio de qual resposta de API, que atualizou qual estado, que renderizou qual componente, na hora de qual evento de DOM?" A correlação entre as 5 camadas é feita manualmente, na cabeça do dev.
+Hoje, debugar um app React exige alternar entre ferramentas isoladas que não se falam: `React DevTools` para a árvore de componentes, `Redux DevTools (ou equivalente)` para estado, a `aba Network do navegador` para requisições, o `console` para logs, e o editor/`tsc` para erros de tipo. Nenhuma delas responde à pergunta:  
+
+>Esse erro de tipo veio de qual resposta de API, que atualizou qual estado, que renderizou qual componente, na hora de qual evento de DOM?
+
+A correlação entre as 5 camadas é feita manualmente, na cabeça do dev.
 
 ### 1.3 Público-alvo
 | Persona | Contexto | Necessidade principal |
 |---|---|---|
 | Dev React em debug local | Investigando um bug num app rodando em dev | Ver, num só lugar, o que aconteceu antes/depois de uma ação: DOM, estado, rede, logs |
-| Dev usando Redux/TanStack | App com estado gerenciado por lib de terceiros | Visibilidade cross-lib do estado antes/depois de uma mudança, sem abrir 2 devtools diferentes |
 
 ### 1.4 Proposta de solução
-Uma camada de instrumentação client-side com um adapter por capacidade (DOM, estado, console, rede, tipos), alimentando um event bus/timeline compartilhado. Consumida via painel `devtools` batteries-included (com timeline scrubber e replay determinístico para DOM/estado/rede) ou via hook headless (`useDebugMachine`) para quem quiser construir UI própria.
-
-### 1.5 Objetivos e métricas de sucesso
-| Objetivo | Métrica | Baseline | Meta | Prazo |
-|---|---|---|---|---|
-| Adoção | Downloads npm/semana | 0 | a definir | 3 meses após 1ª release pública |
-| Bundle enxuto | Tamanho por pacote (gzip) | — | `shared` < 5kB; cada adapter < 3kB | a cada release |
-| Fricção de integração baixa | Linhas de código até o 1º evento capturado | — | ≤ 5 linhas | por adapter |
-| Overhead de runtime aceitável | % adicionado ao tempo de frame com instrumentação ativa | — | a definir (validar com benchmark antes de fixar meta) | antes do v1.0 |
+Uma camada de instrumentação client-side com um adapter por capacidade (DOM, estado, console, rede, tipos), alimentando um event bus/timeline compartilhado. Consumida via painel `devtools` ou via hook (`useDebugMachine`) para quem quiser construir UI própria.
 
 **Métricas de guarda (não podem piorar):**
-- Tempo de frame do app hospedeiro com a instrumentação desligada (overhead deve ser ~0).
-
-> Métricas propostas. Não vieram do usuário, revisar/ajustar antes de aprovar o documento.
+- Separação de responsabilidades: o pacote npm deve ser instalado como uma dependência de desenvolvimento e inicializada sob demanda na aplicação hospedeira usando scripts JavaScript e a Janela do navegador (window.REACT_DEBUG_MACHINE).
+- O debugger não deverá interferir no funcionamento da aplicação sob nenhuma circunstância, funcionando como um plugin completamente apartado.
+- Se a aplicação hospedeira não for React, o plugin ainda poderá acessar recursos como nativos DOM, Console e Network, desde que não tenham relações com a React DOM ou outro recurso do React especificamente.
 
 ### 1.6 Não-objetivos
 - Não é uma ferramenta de APM/monitoramento de produção (não é substituto de Sentry/Datadog).
@@ -67,6 +62,7 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 | Versão | Data | Autor | Mudança | Motivo |
 |---|---|---|---|---|
 | v0.1 | 2026-07-23 | Henrique Costa | Criação do documento | Escopo inicial do projeto "React Debug Machine", reiniciado do zero |
+| v1.0 | 2026-07-24 | Henrique Costa | Atualização do documento | Atualizações de escopo e linguagem do PRD |
 
 **Convenção de versionamento**
 - `v0.x`: rascunho, ainda em discussão
@@ -86,8 +82,6 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 | R-03 | O sistema deve detectar e permitir debug de logs de console emitidos pela aplicação hospedeira | `Must` | Dado um `console.log/warn/error` na app, quando ele é chamado, então aparece no painel sem suprimir o comportamento original do console |
 | R-04 | O sistema deve detectar envio/recebimento de requisições e respostas de API como informação de debug | `Must` | Dado um `fetch`/`XMLHttpRequest`, quando a requisição é enviada e a resposta chega, então ambos aparecem correlacionados no painel |
 | R-05 | O sistema deve expor diagnósticos de tipagem TypeScript (via Language Service) ligados ao componente/estado que os disparou | `Must` | Dado um erro/aviso de tipo reportado pelo TS Language Service, quando ele ocorre, então aparece no painel referenciando o componente/estado de origem |
-
-> Todos os 5 requisitos vieram como escopo confirmado pelo usuário; reprioritize se algum precisar ser adiado.
 
 ### 3.2 User stories
 - Como dev React, quero ver os eventos de DOM disparados para que eu entenda a sequência exata de interações que levou a um bug.
