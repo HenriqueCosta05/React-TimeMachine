@@ -1,4 +1,4 @@
-# PRD — React Debug Machine
+# PRD: React Debug Machine
 
 | Campo | Valor |
 |---|---|
@@ -10,7 +10,7 @@
 | **Release alvo** | — |
 | **Links rápidos** | [Repo](https://github.com/HenriqueCosta05/React-Debug-Machine) · [Design](../docs/DESIGN.md) · [Board](../TODO.md) · [Métricas](#) |
 
-> Este é um documento vivo — atualize junto com as decisões, não depois.
+> Este é um documento vivo. Atualize junto com as decisões, não depois.
 
 ---
 
@@ -20,12 +20,12 @@
 React Debug Machine é um debugger runtime unificado para apps React: correlaciona, num só painel, eventos de DOM, mudanças de estado (React, Redux, TanStack), logs de console, requisições/respostas de API e diagnósticos de tipagem TypeScript.
 
 ### 1.2 Problema
-Hoje, debugar um app React exige alternar entre ferramentas isoladas que não se falam: React DevTools para a árvore de componentes, Redux DevTools (ou equivalente) para estado, a aba Network do navegador para requisições, o console para logs, e o editor/`tsc` para erros de tipo. Nenhuma delas responde à pergunta "esse erro de tipo veio de qual resposta de API, que atualizou qual estado, que renderizou qual componente, na hora de qual evento de DOM?" — a correlação entre as 5 camadas é feita manualmente, na cabeça do dev.
+Hoje, debugar um app React exige alternar entre ferramentas isoladas que não se falam: React DevTools para a árvore de componentes, Redux DevTools (ou equivalente) para estado, a aba Network do navegador para requisições, o console para logs, e o editor/`tsc` para erros de tipo. Nenhuma delas responde à pergunta "esse erro de tipo veio de qual resposta de API, que atualizou qual estado, que renderizou qual componente, na hora de qual evento de DOM?" A correlação entre as 5 camadas é feita manualmente, na cabeça do dev.
 
 ### 1.3 Público-alvo
 | Persona | Contexto | Necessidade principal |
 |---|---|---|
-| Dev React em debug local | Investigando um bug num app rodando em dev | Ver, num só lugar, o que aconteceu antes/depois de uma ação — DOM, estado, rede, logs |
+| Dev React em debug local | Investigando um bug num app rodando em dev | Ver, num só lugar, o que aconteceu antes/depois de uma ação: DOM, estado, rede, logs |
 | Dev usando Redux/TanStack | App com estado gerenciado por lib de terceiros | Visibilidade cross-lib do estado antes/depois de uma mudança, sem abrir 2 devtools diferentes |
 
 ### 1.4 Proposta de solução
@@ -42,12 +42,12 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 **Métricas de guarda (não podem piorar):**
 - Tempo de frame do app hospedeiro com a instrumentação desligada (overhead deve ser ~0).
 
-> Métricas propostas — não vieram do usuário, revisar/ajustar antes de aprovar o documento.
+> Métricas propostas. Não vieram do usuário, revisar/ajustar antes de aprovar o documento.
 
 ### 1.6 Não-objetivos
 - Não é uma ferramenta de APM/monitoramento de produção (não é substituto de Sentry/Datadog).
 - Não cobre frameworks fora do React (Vue, Svelte, etc.).
-- Não cobre debug remoto ou em produção — uso é local, durante desenvolvimento.
+- Não cobre debug remoto ou em produção. Uso é local, durante desenvolvimento.
 - Não cobre mobile/React Native nesta fase.
 
 ### 1.7 Glossário
@@ -69,9 +69,9 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 | v0.1 | 2026-07-23 | Henrique Costa | Criação do documento | Escopo inicial do projeto "React Debug Machine", reiniciado do zero |
 
 **Convenção de versionamento**
-- `v0.x` — rascunho, ainda em discussão
-- `v1.0` — aprovado, escopo congelado para a release
-- `v1.x` — ajustes durante a execução (registrar sempre o motivo)
+- `v0.x`: rascunho, ainda em discussão
+- `v1.0`: aprovado, escopo congelado para a release
+- `v1.x`: ajustes durante a execução (registrar sempre o motivo)
 
 ---
 
@@ -105,11 +105,11 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 | Categoria | Requisito |
 |---|---|
 | Performance | Instrumentação deve ter overhead desprezível quando desabilitada; orçamento de overhead ativo a validar com benchmark |
-| Segurança / privacidade | Nenhum dado capturado sai do navegador — tudo local/in-memory, sem telemetria externa |
+| Segurança / privacidade | Nenhum dado capturado sai do navegador: tudo local/in-memory, sem telemetria externa |
 | Acessibilidade | Painel `devtools` segue WCAG 2.1 AA (é UI de uso diário do dev) |
 | Compatibilidade | React 18 e 19 (fiber shape difere entre versões); versões suportadas de Redux/TanStack a fixar por adapter |
-| Observabilidade | N/A para o produto em si — o produto É a ferramenta de observabilidade |
-| i18n / l10n | Não prioritário nesta fase — painel em inglês ou português, a decidir |
+| Observabilidade | N/A para o produto em si: o produto É a ferramenta de observabilidade |
+| i18n / l10n | Não prioritário nesta fase, painel em inglês ou português, a decidir |
 
 ### 3.4 Fora do escopo
 | Item | Por que está fora | Reconsiderar quando |
@@ -155,7 +155,7 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 | Q-03 | Viabilidade técnica do TS Language Service no browser | Sim (para R-05/M5) | Henrique Costa | antes do M5 | — |
 
 **Trade-offs assumidos**
-- Um pacote por feature em vez de um monólito — escolhido para permitir instalação seletiva (tree-shaking real); custo aceito: mais overhead de manutenção entre pacotes (versionamento, publish).
+- Um pacote por feature em vez de um monólito. Escolhido para permitir instalação seletiva (tree-shaking real); custo aceito: mais overhead de manutenção entre pacotes (versionamento, publish).
 
 ---
 
@@ -167,7 +167,7 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 - Backlog: [TODO.md](../TODO.md)
 
 **Externas**
-- React internals (fiber) — sem link fixo, documentação não-oficial da comunidade
+- React internals (fiber), sem link fixo, documentação não-oficial da comunidade
 - API pública do Redux e do TanStack Query/Store
 - TypeScript Compiler API / Language Service
 
@@ -182,6 +182,6 @@ Uma camada de instrumentação client-side com um adapter por capacidade (DOM, e
 - [x] Requisitos não-funcionais foram considerados
 - [x] Riscos têm mitigação e dono
 - [x] Questões em aberto têm responsável e prazo (prazos ainda genéricos)
-- [ ] Pelo menos um engenheiro revisou a viabilidade técnica (pendente — especialmente R-05)
+- [ ] Pelo menos um engenheiro revisou a viabilidade técnica (pendente, especialmente R-05)
 - [x] Termos e siglas estão no glossário
 - [x] Changelog atualizado e versão incrementada

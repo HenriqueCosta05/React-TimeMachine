@@ -1,16 +1,16 @@
-# Design Spec — React Debug Machine (painel `devtools`)
+# Design Spec: React Debug Machine (painel `devtools`)
 
 Tokens concretos e regras de componente para o painel
 (`@henriquecosta/react-debug-machine-devtools`, componente `DebugMachineDevtools` /
 hook `useDebugMachine`). Valores marcados `a definir` precisam de decisão
-antes da implementação — este documento não deve ficar com placeholder
+antes da implementação. Este documento não deve ficar com placeholder
 permanente uma vez que o painel comece a ser construído.
 
 ## Brand
 
 - Nome: React Debug Machine
 - Tom: denso (mostra muita informação por área de tela sem esconder dados),
-  preciso (nunca arredonda/omite valor capturado — o dev está debugando,
+  preciso (nunca arredonda/omite valor capturado: o dev está debugando,
   precisão > estética), discreto (toggle fixo, não invasivo até ser aberto).
 
 ## Color tokens

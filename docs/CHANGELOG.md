@@ -7,7 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-Nenhuma mudança de produto ainda — projeto reiniciado do zero. Este arquivo
+Nenhuma mudança de produto ainda. Projeto reiniciado do zero. Este arquivo
 passa a receber entradas quando o primeiro adapter (`shared`) for
 implementado.
 

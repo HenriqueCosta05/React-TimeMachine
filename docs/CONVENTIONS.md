@@ -1,4 +1,4 @@
-# Convenções de Arquitetura e Código — React Debug Machine
+# Convenções de Arquitetura e Código: React Debug Machine
 
 | Campo | Valor |
 |---|---|
@@ -32,14 +32,14 @@
 
 ### 1.2 Política de versões e dependências
 
-- Gerenciador de pacotes obrigatório: `pnpm` — lockfile é versionado e nunca regenerado sem justificativa.
+- Gerenciador de pacotes obrigatório: `pnpm`. Lockfile é versionado e nunca regenerado sem justificativa.
 - Estratégia de atualização: a definir.
 - Critérios para adicionar uma nova dependência:
   1. Resolve um problema real que já apareceu, não um hipotético.
   2. Manutenção ativa nos últimos meses.
-  3. Custo de bundle aceitável — cada pacote/adapter tem orçamento próprio (ver PRD §1.5).
+  3. Custo de bundle aceitável: cada pacote/adapter tem orçamento próprio (ver PRD §1.5).
   4. Existe caminho de saída (é substituível sem reescrever o domínio).
-- Dependências proibidas / desencorajadas: nenhuma dependência que exija telemetria/rede externa — o produto nunca envia dados capturados para fora do navegador.
+- Dependências proibidas / desencorajadas: nenhuma dependência que exija telemetria/rede externa. O produto nunca envia dados capturados para fora do navegador.
 
 ### 1.3 Ambiente de desenvolvimento
 
@@ -47,7 +47,7 @@
 |---|---|
 | OS suportado | Windows (ambiente primário), com scripts `.ps1`/`.sh` equivalentes para Linux/macOS |
 | Versão de runtime | a fixar em `.nvmrc` quando o workspace for recriado |
-| Variáveis de ambiente | Não previstas — ferramenta 100% client-side, sem configuração de ambiente sensível |
+| Variáveis de ambiente | Não previstas: ferramenta 100% client-side, sem configuração de ambiente sensível |
 | Comandos essenciais | `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build` · `pnpm typecheck` |
 
 ---
@@ -56,11 +56,11 @@
 
 ### 2.1 Princípios inegociáveis
 
-1. **Clareza acima de esperteza** — código de instrumentação já é difícil de ler por natureza (hooks em internals, patches de globais); não piorar isso com abstração desnecessária.
-2. **Reversibilidade de patches globais** — qualquer patch em `console`, `fetch`, `XMLHttpRequest` ou fiber precisa de um caminho de restore explícito; nunca é permanente.
-3. **Simples agora, extensível depois** — evitar abstração compartilhada entre adapters antes do terceiro caso real de reuso.
-4. **Adapter é opcional e isolado** — cada adapter (dom-events, state, console, network, types) funciona de forma independente; a ausência de um não quebra os demais.
-5. **Sem estado global sem justificativa** — o event bus em `shared` é a única fonte compartilhada; adapters não guardam estado próprio além do necessário para capturar/repetir.
+1. **Clareza acima de esperteza**: código de instrumentação já é difícil de ler por natureza (hooks em internals, patches de globais); não piorar isso com abstração desnecessária.
+2. **Reversibilidade de patches globais**: qualquer patch em `console`, `fetch`, `XMLHttpRequest` ou fiber precisa de um caminho de restore explícito; nunca é permanente.
+3. **Simples agora, extensível depois**: evitar abstração compartilhada entre adapters antes do terceiro caso real de reuso.
+4. **Adapter é opcional e isolado**: cada adapter (dom-events, state, console, network, types) funciona de forma independente; a ausência de um não quebra os demais.
+5. **Sem estado global sem justificativa**: o event bus em `shared` é a única fonte compartilhada; adapters não guardam estado próprio além do necessário para capturar/repetir.
 
 ### 2.2 Regras práticas
 
@@ -70,10 +70,10 @@
 | Tamanho de função | ≤ 40 linhas / 1 responsabilidade | — |
 | Aninhamento | máx. 3 níveis; usar early return | — |
 | Comentários | explicam o *porquê*, nunca o *o quê* | — |
-| Tipagem | `any` proibido; `unknown` + narrowing — especialmente relevante aqui, já que o produto introspecciona valores de shape arbitrário (estado da app hospedeira) | — |
-| Mutabilidade | dados imutáveis por padrão | eventos capturados são snapshots — nunca mutados após captura |
-| Tratamento de erro | sem `catch` silencioso | um adapter que falha ao capturar não deve derrubar a app hospedeira — falha isolada, reportada, não engolida |
-| Código morto | removido, não comentado — o histórico está no Git | — |
+| Tipagem | `any` proibido; `unknown` + narrowing, especialmente relevante aqui, já que o produto introspecciona valores de shape arbitrário (estado da app hospedeira) | — |
+| Mutabilidade | dados imutáveis por padrão | eventos capturados são snapshots, nunca mutados após captura |
+| Tratamento de erro | sem `catch` silencioso | um adapter que falha ao capturar não deve derrubar a app hospedeira: falha isolada, reportada, não engolida |
+| Código morto | removido, não comentado: o histórico está no Git | — |
 
 ### 2.3 Convenções de nomenclatura
 
@@ -89,7 +89,7 @@
 | Pacotes npm | `@henriquecosta/react-debugmachine-<pacote>` | `@<henriquecosta>/react-debugmachine-network` |
 | Idioma do código | inglês para código e commits; português para docs internas | — |
 
-> Scope npm definitivo ainda em aberto (Q-01 no PRD) — placeholder `<scope>` até ser decidido.
+> Scope npm definitivo ainda em aberto (Q-01 no PRD). Placeholder `<scope>` até ser decidido.
 
 ### 2.4 Estrutura de diretórios
 
@@ -140,12 +140,12 @@ Regras de import:
 - O que **sempre** exige teste: lógica de diff de estado, replay de mutações de DOM (posição/ordem), interceptação de rede (fetch e XHR), qualquer bug corrigido (teste de regressão).
 - O que **não** exige: markup estático do painel, wrappers triviais.
 - Testes descrevem comportamento, não implementação: `deve reproduzir remoção de nó no meio da lista na mesma posição original`.
-- `types` (Language Service real) provavelmente não é testável isoladamente em jsdom — validar em Playwright ou ambiente Node com TS real.
+- `types` (Language Service real) provavelmente não é testável isoladamente em jsdom. Validar em Playwright ou ambiente Node com TS real.
 
 ### 2.6 Git e revisão
 
 - Branches: `main` protegida; `feat|fix|chore/descricao-curta`.
-- Commits: Conventional Commits — `feat(network): adiciona interceptação de XHR`.
+- Commits: Conventional Commits (`feat(network): adiciona interceptação de XHR`).
 - PR: descrição com contexto + como testar, 1 aprovação mínima.
 - Merge: squash.
 - Checklist de review:
@@ -169,13 +169,13 @@ Regras de import:
 
 ### 3.2 Princípios estruturais
 
-1. **Fronteiras por feature, não por camada** — cada uma das 5 capacidades é um pacote independente; a UI (`devtools`) é a única camada que conhece todos os adapters.
-2. **Dependências apontam para dentro** — `devtools` depende dos adapters; nenhum adapter depende de `devtools`.
-3. **Fonte única da verdade** — o event bus em `shared` é o único canal de eventos capturados; adapters publicam, nunca leem de volta.
-4. **Contratos explícitos nas bordas** — todo evento publicado no bus segue o schema definido em `shared`, validado no ponto de publicação.
-5. **Falha isolada** — um adapter que quebra (ex.: `types` sem Language Service disponível) degrada silenciosamente, não derruba os outros 4.
-6. **Reversibilidade** — qualquer patch de objeto global tem função de restore; desligar a instrumentação devolve o app ao estado original.
-7. **Observabilidade desde o dia 1** — mesmo sendo uma ferramenta de observabilidade, ela própria não se auto-monitora com telemetria externa; only local, in-memory.
+1. **Fronteiras por feature, não por camada**: cada uma das 5 capacidades é um pacote independente; a UI (`devtools`) é a única camada que conhece todos os adapters.
+2. **Dependências apontam para dentro**: `devtools` depende dos adapters; nenhum adapter depende de `devtools`.
+3. **Fonte única da verdade**: o event bus em `shared` é o único canal de eventos capturados; adapters publicam, nunca leem de volta.
+4. **Contratos explícitos nas bordas**: todo evento publicado no bus segue o schema definido em `shared`, validado no ponto de publicação.
+5. **Falha isolada**: um adapter que quebra (ex.: `types` sem Language Service disponível) degrada silenciosamente, não derruba os outros 4.
+6. **Reversibilidade**: qualquer patch de objeto global tem função de restore; desligar a instrumentação devolve o app ao estado original.
+7. **Observabilidade desde o dia 1**: mesmo sendo uma ferramenta de observabilidade, ela própria não se auto-monitora com telemetria externa; apenas local, in-memory.
 
 ### 3.3 Contexto do sistema
 
@@ -203,7 +203,7 @@ flowchart LR
 
 | Concern | Definição para este projeto |
 |---|---|
-| Autenticação / autorização | N/A — ferramenta local, sem backend |
+| Autenticação / autorização | N/A: ferramenta local, sem backend |
 | Gestão de erros | Erro em um adapter é capturado e reportado no painel como "adapter indisponível"; nunca propaga para a app hospedeira |
 | Logging e telemetria | Nunca há envio externo; tudo fica local/in-memory na sessão do navegador |
 | Configuração | Instrumentação configurada via props/opções no ponto de instalação de cada adapter; sem arquivo de config externo |
@@ -240,7 +240,7 @@ flowchart LR
 
 | Item | Impacto | Custo estimado | Gatilho para pagar |
 |---|---|---|---|
-| — | — | — | Projeto reiniciado do zero — nenhuma dívida técnica ainda |
+| — | — | — | Projeto reiniciado do zero. Nenhuma dívida técnica ainda |
 
 ---
 
